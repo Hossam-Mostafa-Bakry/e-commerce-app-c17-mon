@@ -1,7 +1,11 @@
 import 'package:ecommerce_app/core/resources/color_manager.dart';
 import 'package:ecommerce_app/core/resources/values_manager.dart';
+import 'package:ecommerce_app/features/main_layout/categories/presentation/manager/sub_category_bloc.dart';
 import 'package:ecommerce_app/features/main_layout/categories/presentation/widgets/category_item.dart';
+import 'package:ecommerce_app/features/main_layout/home/domain/entities/category_data.dart';
+import 'package:ecommerce_app/features/main_layout/home/presentation/manager/home_bloc.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 
 class CategoriesList extends StatefulWidget {
   const CategoriesList({super.key});
@@ -37,6 +41,10 @@ class _CategoriesListState extends State<CategoriesList> {
         ),
       ),
 
+      /// add event to get all categories
+      ///
+      /// 1- sates --> based on --> Ui [Loading, Success, Error]
+      ///
       // the categories items list
       child: ClipRRect(
         // clip the corners of the container that hold the list view
@@ -44,19 +52,45 @@ class _CategoriesListState extends State<CategoriesList> {
           topLeft: Radius.circular(AppSize.s12),
           bottomLeft: Radius.circular(AppSize.s12),
         ),
-        child: ListView.builder(
-          itemCount: 20,
-          itemBuilder: (context, index) => CategoryItem(index,
-              "Laptops & Electronics", selectedIndex == index, onItemClick),
+        child: BlocConsumer<HomeBloc, HomeState>(
+          listener: (context, state) {
+            if (state is SuccessGetCategoriesState) {
+              context.read<SubCategoryBloc>().add(GetSubCategoriesEvent(
+                  state.categoriesList[selectedIndex].id));
+            }
+          },
+          builder: (context, state) {
+            switch (state) {
+              case HomeInitial():
+                return const Center(child: CircularProgressIndicator());
+              case LoadingGetCategoriesState():
+                return const Center(child: CircularProgressIndicator());
+              case SuccessGetCategoriesState():
+                return ListView.builder(
+                  itemCount: state.categoriesList.length,
+
+                  /// Encapsulation
+                  itemBuilder: (context, index) => CategoryItem(
+                    state.categoriesList[index],
+                    index,
+                    selectedIndex == index,
+                    onItemClick,
+                  ),
+                );
+              case ErrorGetCategoriesState():
+                return Center(child: Text(state.message));
+            }
+          },
         ),
       ),
     ));
   }
 
   // callback function to change the selected index
-  onItemClick(int index) {
+  onItemClick(int index, CategoryData data) {
     setState(() {
       selectedIndex = index;
+      context.read<SubCategoryBloc>().add(GetSubCategoriesEvent(data.id));
     });
   }
 }
