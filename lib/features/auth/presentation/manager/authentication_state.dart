@@ -9,17 +9,21 @@ final class AuthenticationInitial extends AuthenticationState {
   List<Object> get props => [];
 }
 
-final class AuthenticationSignInLoadingState extends AuthenticationState {
+final class AuthenticationLoadingState extends AuthenticationState {
   @override
   List<Object> get props => [];
 }
 
-final class AuthenticationSignInSuccessState extends AuthenticationState {
+final class AuthenticationSuccessState extends AuthenticationState {
   @override
   List<Object> get props => [];
 }
 
-final class AuthenticationSignInErrorState extends AuthenticationState {
+final class AuthenticationErrorState extends AuthenticationState {
+  final String exception;
+
+  const AuthenticationErrorState(this.exception);
+
   @override
   List<Object> get props => [];
 }

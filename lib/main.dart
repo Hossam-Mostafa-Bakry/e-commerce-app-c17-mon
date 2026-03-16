@@ -1,9 +1,12 @@
+import 'package:bot_toast/bot_toast.dart';
+import 'package:ecommerce_app/core/di_core/app_di_core.dart';
 import 'package:ecommerce_app/core/routes_manager/routes.dart';
+import 'package:ecommerce_app/core/services/loading_service.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_easyloading/flutter_easyloading.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import 'core/routes_manager/route_generator.dart';
-
 
 /// 1- Repository pattern
 /// 2- Clean Architecture
@@ -20,7 +23,14 @@ import 'core/routes_manager/route_generator.dart';
 /// * Home
 
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  /// Setup Service Locator For All App Features
+  AppDiCore.setup();
+
   runApp(const MainApp());
+
+  configLoading();
 }
 
 class MainApp extends StatelessWidget {
@@ -36,7 +46,8 @@ class MainApp extends StatelessWidget {
         debugShowCheckedModeBanner: false,
         home: child,
         onGenerateRoute: RouteGenerator.getRoute,
-        initialRoute: Routes.signInRoute,
+        initialRoute: Routes.initial,
+        builder: EasyLoading.init(builder: BotToastInit()),
       ),
     );
   }
